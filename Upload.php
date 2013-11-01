@@ -40,7 +40,7 @@ class KindEditor_Upload extends Widget_Upload implements Widget_Interface_Do
 
         $options = Typecho_Widget::widget('Widget_Options');
         $date = new Typecho_Date($options->gmtTime);
-        $path = Typecho_Common::url(__TYPECHO_CONFIG_DIR__ . parent::UPLOAD_PATH, __TYPECHO_ROOT_DIR__);
+        $path = Typecho_Common::url(parent::UPLOAD_PATH, __TYPECHO_ROOT_DIR__);
 
         //创建上传目录
         if (!is_dir($path)) {
@@ -90,7 +90,7 @@ class KindEditor_Upload extends Widget_Upload implements Widget_Interface_Do
         //返回相对存储路径
         return array(
             'name' => $file['name'],
-            'path' => __TYPECHO_CONFIG_DIR__ . self::UPLOAD_PATH . '/' . $date->year . '/' . $date->month . '/' . $fileName,
+            'path' => self::UPLOAD_PATH . '/' . $date->year . '/' . $date->month . '/' . $fileName,
             'size' => $file['size'],
             'type' => $ext,
             'mime' => Typecho_Common::mimeContentType($path)
