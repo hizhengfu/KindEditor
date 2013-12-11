@@ -61,16 +61,9 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
 
 
         $editorUploadFlagOptions = array('1' => '开启', '0' => '关闭');
-        $editorUploadFlagDescription = _t('附件指图片、文件、视频、Flash文件等');
+        $editorUploadFlagDescription = _t('附件指图片、文件、视频、Flash文件等。上传文件类型与系统一致。');
         $editorUploadFlag = new Typecho_Widget_Helper_Form_Element_Radio('editorUploadFlag', $editorUploadFlagOptions, '1', _t('附件上传'), $editorUploadFlagDescription);
 
-
-        $isShowPrettyOptions = array(
-            '0' => '关闭',
-            '1' => '自己在模板中添加',
-            '2' => '默认分格',
-        );
-        $isShowPretty = new Typecho_Widget_Helper_Form_Element_Radio('isShowPretty', $isShowPrettyOptions, '2', _t('渲染代码'));
 
         $line = new Typecho_Widget_Helper_Layout('hr');
 
@@ -90,7 +83,6 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
         $form->addInput($editorTheme);
         $form->addInput($editorLang);
         $form->addInput($editorUploadFlag);
-        $form->addInput($isShowPretty);
         $form->addItem($line);
         $form->addInput($editorNewlineTag);
         $form->addInput($editorPasteType);
@@ -117,7 +109,7 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
     {
         $options = Helper::options();
         $config = $options->plugin(self::$pluginName);
-        $pluginName=self::$pluginName;
+        $pluginName = self::$pluginName;
 
         $editorTheme = $config->editorTheme;
         $editorLang = $config->editorLang;
@@ -142,14 +134,33 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
             $editorPasteType = 2;
         }
 
+        $_e = '_e';
+
 
         echo <<<EOF
 <link rel="stylesheet" href="{$editor_default_css_url}" />
 <link rel="stylesheet" href="{$editor_css_url}" />
+<style>
+.ke-icon-more {
+    background-position: 0px -1024px;
+    width: 16px;
+    height: 16px;
+}
+</style>
 <script type="text/javascript" src="{$kindeditor_js_url}"></script>
 <script type="text/javascript" src="{$lang_js_url}"></script>
 <script type="text/javascript">
 var keditor;
+//摘要分割线
+KindEditor.lang({
+    more : '摘要分割线'
+});
+KindEditor.plugin('more', function(K) {
+    var self = this, name = 'more';
+    self.clickToolbar(name, function() {
+        self.insertHtml('<!--more-->');
+    });
+});
 KindEditor.ready(function(K) {
         keditor = K.create("textarea#text", {
         	themeType : '{$editorTheme}',
@@ -169,11 +180,11 @@ KindEditor.ready(function(K) {
         'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'code', 'fullscreen', '/',
         'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
         'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image',
-        'media', 'insertfile', 'table', 'hr', 'pagebreak',
-        'anchor', 'link', 'unlink', '|', 'undo', 'redo']
+        'media', 'insertfile', 'table', 'hr',
+        'anchor', 'link', 'unlink', '|', 'undo', 'redo','|','more']
         });
 
-        /*点击保存按钮的时候同步数据到数据*/
+        /*点击保存按钮的时候同步数据到textarea*/
         $("#btn-submit,#btn-save").on("click", function(e) {
             keditor.sync();
         });
@@ -187,29 +198,39 @@ KindEditor.ready(function(K) {
             keditor.insertHtml(html).hideDialog().focus();
         };
 });
-</script>
 
-EOF;
-        /**兼容原有自动保存功能**/
-        if ($options->autoSave) {
-            echo <<<EOF
-<script type="text/javascript">
+$(document).ready(function () {
     var submitted = false, form = $('form[name=write_post],form[name=write_page]').submit(function () {
         submitted = true;
     }), savedData = null;
+
+    // 自动检测离开页
+    var lastData = form.serialize();
+    $(window).bind('beforeunload', function () {
+        if (!!savedData) {
+            lastData = savedData;
+        }
+        if (form.serialize() != lastData && !submitted) {
+            return '内容已经改变尚未保存, 您确认要离开此页面吗?';
+        }
+    });
+EOF;
+/**兼容原有自动保存功能**/
+if ($options->autoSave) {
+    echo <<<EOF
     var locked = false,
         formAction = form.attr('action'),
         idInput = $('input[name=cid]'),
         cid = idInput.val(),
-        autoSave = $('#auto-save-message'),
+        autoSave = $('<span id="auto-save-message" class="left"></span>').prependTo('.submit'),
         autoSaveOnce = !!cid,
         lastSaveTime = null;
 
     function autoSaveListener () {
         setInterval(function () {
             idInput.val(cid);
-            keditor.sync();
             var data = form.serialize();
+            keditor.sync();
 
             if (savedData != data && !locked) {
                 locked = true;
@@ -221,7 +242,7 @@ EOF;
                     cid = o.cid;
                     autoSave.text('内容已经保存' + ' (' + o.time + ')').effect('highlight', 1000);
                     locked = false;
-                });
+                }, 'json');
             }
         }, 10000);
     }
@@ -233,7 +254,7 @@ EOF;
 
     $('#text').bind('input propertychange', function () {
         if (!locked) {
-            autoSave.text('内容尚未保存' + (lastSaveTime ? ' 上次保存时间: ' + lastSaveTime + ')' : ''));
+            autoSave.text('内容尚未保存' + (lastSaveTime ? ' (上次保存时间: ' + lastSaveTime + ')' : ''));
         }
 
         if (!autoSaveOnce) {
@@ -241,10 +262,11 @@ EOF;
             autoSaveListener();
         }
     });
-</script>
-
 EOF;
         }
+echo <<<EOF
+});
+</script>
+EOF;
     }
-
 }
