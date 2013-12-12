@@ -144,6 +144,7 @@ var keditor;
 KindEditor.ready(function(K) {
         keditor = K.create("textarea#text", {
         	themeType : '{$editorTheme}',
+        	resizeType:1,
         	width : '100%',
         	height : '{$options->editorSize}px',
         	langType : '{$editorLang}',
