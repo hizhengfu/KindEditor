@@ -128,39 +128,19 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
 
         $editorUploadJson .= isset($post->cid) ? "?cid={$post->cid}" : '';
 
-        $editorNewlineTag = $config->editorUploadFlag;
+        $editorNewlineTag = $config->editorNewlineTag;
         $editorPasteType = $config->editorPasteType;
         if (!in_array($editorPasteType, array('1', '2', '0'))) {
             $editorPasteType = 2;
         }
 
-        $_e = '_e';
-
-
         echo <<<EOF
 <link rel="stylesheet" href="{$editor_default_css_url}" />
 <link rel="stylesheet" href="{$editor_css_url}" />
-<style>
-.ke-icon-more {
-    background-position: 0px -1024px;
-    width: 16px;
-    height: 16px;
-}
-</style>
 <script type="text/javascript" src="{$kindeditor_js_url}"></script>
 <script type="text/javascript" src="{$lang_js_url}"></script>
 <script type="text/javascript">
 var keditor;
-//摘要分割线
-KindEditor.lang({
-    more : '摘要分割线'
-});
-KindEditor.plugin('more', function(K) {
-    var self = this, name = 'more';
-    self.clickToolbar(name, function() {
-        self.insertHtml('<!--more-->');
-    });
-});
 KindEditor.ready(function(K) {
         keditor = K.create("textarea#text", {
         	themeType : '{$editorTheme}',
@@ -174,6 +154,7 @@ KindEditor.ready(function(K) {
         	uploadJson : '{$editorUploadJson}',
         	newlineTag : '{$editorNewlineTag}',
         	pasteType : {$editorPasteType},
+        	pagebreakHtml:'<!--more-->',
         	afterBlur : function() {keditor.sync();},
 			items : ['source', '|', 'preview', 'template', 'cut', 'copy', 'paste',
         'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
@@ -182,7 +163,7 @@ KindEditor.ready(function(K) {
         'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
         'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image',
         'media', 'insertfile', 'table', 'hr',
-        'anchor', 'link', 'unlink', '|', 'undo', 'redo','|','more']
+        'anchor', 'link', 'unlink', '|', 'undo', 'redo','|','pagebreak']
         });
 
         /*点击保存按钮的时候同步数据到textarea*/
