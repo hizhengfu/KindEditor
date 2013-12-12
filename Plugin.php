@@ -166,11 +166,6 @@ KindEditor.ready(function(K) {
         'anchor', 'link', 'unlink', '|', 'undo', 'redo','|','pagebreak']
         });
 
-        /*点击保存按钮的时候同步数据到textarea*/
-        $("#btn-submit,#btn-save").on("click", function(e) {
-            keditor.sync();
-        });
-
         //插入编辑器
         Typecho.insertFileToEditor = function (file, url, isImage) {
             var html='<a href="' + url + '" title="' + file + '">' + file + '</a>';
