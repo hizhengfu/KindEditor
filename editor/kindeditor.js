@@ -5,7 +5,7 @@
 * @author Roddy <luolonghao@gmail.com>
 * @website http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
-* @version 4.1.9 (2013-10-08)
+* @version 4.1.10 (2013-11-23)
 *******************************************************************************/
 (function (window, undefined) {
 	if (window.KindEditor) {
@@ -17,9 +17,10 @@ if (!window.console) {
 if (!console.log) {
 	console.log = function () {};
 }
-var _VERSION = '4.1.9 (2013-10-08)',
+var _VERSION = '4.1.10 (2013-11-23)',
 	_ua = navigator.userAgent.toLowerCase(),
 	_IE = _ua.indexOf('msie') > -1 && _ua.indexOf('opera') == -1,
+	_NEWIE = _ua.indexOf('msie') == -1 && _ua.indexOf('trident') > -1,
 	_GECKO = _ua.indexOf('gecko') > -1 && _ua.indexOf('khtml') == -1,
 	_WEBKIT = _ua.indexOf('applewebkit') > -1,
 	_OPERA = _ua.indexOf('opera') > -1,
@@ -398,15 +399,17 @@ _extend(KEvent, {
 		var ev = this.event;
 		if (ev.preventDefault) {
 			ev.preventDefault();
+		} else {
+			ev.returnValue = false;
 		}
-		ev.returnValue = false;
 	},
 	stopPropagation : function() {
 		var ev = this.event;
 		if (ev.stopPropagation) {
 			ev.stopPropagation();
+		} else {
+			ev.cancelBubble = true;
 		}
-		ev.cancelBubble = true;
 	},
 	stop : function() {
 		this.preventDefault();
@@ -727,7 +730,8 @@ function _formatHtml(html, htmlTags, urlType, wellFormatted, indentChar) {
 	html = html.replace(/(<(?:p|p\s[^>]*)>)\s*(<\/p>)/ig, '$1<br />$2');
 	html = html.replace(/\u200B/g, '');
 	html = html.replace(/\u00A9/g, '&copy;');
-	html = html.replace(/<[^>]+>/g, function($0) {
+	html = html.replace(/\u00AE/g, '&reg;');
+	html = html.replace(/<[^>]+/g, function($0) {
 		return $0.replace(/\s+/g, ' ');
 	});
 	var htmlTagMap = {};
@@ -1273,7 +1277,7 @@ function _docWidth(doc) {
 function _getScrollPos(doc) {
 	doc = doc || document;
 	var x, y;
-	if (_IE || _OPERA) {
+	if (_IE || _NEWIE || _OPERA) {
 		x = _docElement(doc).scrollLeft;
 		y = _docElement(doc).scrollTop;
 	} else {
@@ -3103,30 +3107,19 @@ _extend(KCmd, {
 		});
 	},
 	forecolor : function(val) {
-		return this.toggle('<span style="color:' + val + ';"></span>', {
-			span : '.color=' + val,
-			font : 'color'
-		});
+		return this.wrap('<span style="color:' + val + ';"></span>').select();
 	},
 	hilitecolor : function(val) {
-		return this.toggle('<span style="background-color:' + val + ';"></span>', {
-			span : '.background-color=' + val
-		});
+		return this.wrap('<span style="background-color:' + val + ';"></span>').select();
 	},
 	fontsize : function(val) {
-		return this.toggle('<span style="font-size:' + val + ';"></span>', {
-			span : '.font-size=' + val,
-			font : 'size'
-		});
+		return this.wrap('<span style="font-size:' + val + ';"></span>').select();
 	},
 	fontname : function(val) {
 		return this.fontfamily(val);
 	},
 	fontfamily : function(val) {
-		return this.toggle('<span style="font-family:' + val + ';"></span>', {
-			span : '.font-family=' + val,
-			font : 'face'
-		});
+		return this.wrap('<span style="font-family:' + val + ';"></span>').select();
 	},
 	removeformat : function() {
 		var map = {
@@ -3724,12 +3717,16 @@ _extend(KEdit, KWidget, {
 		!isDocumentDomain && ready();
 	},
 	setWidth : function(val) {
-		this.div.css('width', _addUnit(val));
-		return this;
+		var self = this;
+		val = _addUnit(val);
+		self.width = val;
+		self.div.css('width', val);
+		return self;
 	},
 	setHeight : function(val) {
 		var self = this;
 		val = _addUnit(val);
+		self.height = val;
 		self.div.css('height', val);
 		self.iframe.css('height', val);
 		if ((_IE && _V < 8) || _QUIRKS) {
@@ -4175,6 +4172,8 @@ _extend(KUploadButton, {
 		self.iframe = options.target ? K('iframe[name="' + target + '"]') : K('iframe', div);
 		self.form = options.form ? K(options.form) : K('form', div);
 		self.fileBox = K('.ke-upload-file', div);
+		var width = options.width || K('.ke-button-common', div).width();
+		K('.ke-upload-area', div).width(width);
 		self.options = options;
 	},
 	submit : function() {

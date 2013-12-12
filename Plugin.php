@@ -1,10 +1,12 @@
 <?php
 /**
- * KindEditor编辑器
+ * KindEditor编辑器<br>
+ * 基于KindEditor 4.1.10
  *
  * @package KindEditor
  * @author hizhengfu
- * @version 4.0
+ * @version 4.0.1
+ * @link https://github.com/hizhengfu/typecho-kindeditor
  */
 class KindEditor_Plugin implements Typecho_Plugin_Interface
 {

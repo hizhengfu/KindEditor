@@ -1,4 +1,5 @@
 .ke-container{box-sizing: border-box;}
+.ke-input-text{box-sizing: content-box!important;padding: 2px 4px!important;}
 /* common */
 .ke-inline-block {
 	display: -moz-inline-stack;
@@ -820,7 +821,7 @@
 	text-decoration: none;
 }
 /* inputbox */
-input.ke-input-text {
+.ke-input-text {
 	background-color:#FFFFFF;
 	font-family: "sans serif",tahoma,verdana,helvetica;
 	font-size: 12px;
@@ -833,7 +834,6 @@ input.ke-input-text {
 	display: -moz-inline-stack;
 	display: inline-block;
 	vertical-align: middle;
-    box-sizing: content-box;
 	zoom: 1;
 	*display: inline;
 }
@@ -864,6 +864,7 @@ input.ke-input-text {
 	overflow: hidden;
 	margin: 0;
 	padding: 0;
+	*height: 25px;
 }
 .ke-upload-area .ke-upload-file {
 	position: absolute;
