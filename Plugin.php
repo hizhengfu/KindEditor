@@ -174,6 +174,7 @@ KindEditor.ready(function(K) {
         	uploadJson : '{$editorUploadJson}',
         	newlineTag : '{$editorNewlineTag}',
         	pasteType : {$editorPasteType},
+        	afterBlur : function() {keditor.sync();},
 			items : ['source', '|', 'preview', 'template', 'cut', 'copy', 'paste',
         'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
         'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
@@ -197,74 +198,6 @@ KindEditor.ready(function(K) {
             }
             keditor.insertHtml(html).hideDialog().focus();
         };
-});
-
-$(document).ready(function () {
-    var submitted = false, form = $('form[name=write_post],form[name=write_page]').submit(function () {
-        submitted = true;
-    }), savedData = null;
-
-    // 自动检测离开页
-    var lastData = form.serialize();
-    $(window).bind('beforeunload', function () {
-        if (!!savedData) {
-            lastData = savedData;
-        }
-        if (form.serialize() != lastData && !submitted) {
-            return '内容已经改变尚未保存, 您确认要离开此页面吗?';
-        }
-    });
-EOF;
-/**兼容原有自动保存功能**/
-if ($options->autoSave) {
-    echo <<<EOF
-    var locked = false,
-        formAction = form.attr('action'),
-        idInput = $('input[name=cid]'),
-        cid = idInput.val(),
-        autoSave = $('<span id="auto-save-message" class="left"></span>').prependTo('.submit'),
-        autoSaveOnce = !!cid,
-        lastSaveTime = null;
-
-    function autoSaveListener () {
-        setInterval(function () {
-            idInput.val(cid);
-            var data = form.serialize();
-            keditor.sync();
-
-            if (savedData != data && !locked) {
-                locked = true;
-
-                autoSave.text('正在保存');
-                $.post(formAction + '?do=save', data, function (o) {
-                    savedData = data;
-                    lastSaveTime = o.time;
-                    cid = o.cid;
-                    autoSave.text('内容已经保存' + ' (' + o.time + ')').effect('highlight', 1000);
-                    locked = false;
-                }, 'json');
-            }
-        }, 10000);
-    }
-
-    if (autoSaveOnce) {
-        savedData = form.serialize();
-        autoSaveListener();
-    }
-
-    $('#text').bind('input propertychange', function () {
-        if (!locked) {
-            autoSave.text('内容尚未保存' + (lastSaveTime ? ' (上次保存时间: ' + lastSaveTime + ')' : ''));
-        }
-
-        if (!autoSaveOnce) {
-            autoSaveOnce = true;
-            autoSaveListener();
-        }
-    });
-EOF;
-        }
-echo <<<EOF
 });
 </script>
 EOF;
