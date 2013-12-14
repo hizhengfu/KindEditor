@@ -6,8 +6,6 @@ typecho kindeditor plugin
 
 插件名称应该为KindEditor
 
-git clone https://github.com/hizhengfu/typecho-kindeditor.git KindEditor
-
 ## TODO
 
 * 文件浏览
