@@ -21,8 +21,8 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
      */
     public static function activate()
     {
-        Typecho_Plugin::factory('admin/write-post.php')->richEditor = array(__CLASS__, 'render');
-        Typecho_Plugin::factory('admin/write-page.php')->richEditor = array(__CLASS__, 'render');
+        Typecho_Plugin::factory('admin/write-post.php')->richEditor = array(self::$pluginName . '_Plugin', 'render');
+        Typecho_Plugin::factory('admin/write-page.php')->richEditor = array(self::$pluginName . '_Plugin', 'render');
         Helper::addAction('plugins-kind-upload', 'KindEditor_Upload');
     }
 
