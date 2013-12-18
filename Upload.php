@@ -3,7 +3,7 @@
  * @package KindEditor
  * @author hizhengfu
  */
-class KindEditor_Upload extends Widget_Upload implements Widget_Interface_Do
+class KindEditor_Upload extends Widget_Upload
 {
     /**
      * 创建上传路径
@@ -223,12 +223,23 @@ class KindEditor_Upload extends Widget_Upload implements Widget_Interface_Do
                     $this->db->fetchRow($this->select()->where('table.contents.cid = ?', $insertId)
                         ->where('table.contents.type = ?', 'attachment'), array($this, 'push'));
 
-                    $this->response->throwJson(array('error' => 0, 'url' => $this->attachment->url));
+                    $this->throwJson(array('error' => 0, 'url' => $this->attachment->url));
                 }
             }
         }
 
-        $this->response->throwJson(array('error' => 1, 'message' => $result));
+        $this->throwJson(array('error' => 1, 'message' => $result));
+    }
+
+    public function throwJson($message)
+    {
+        /** 设置http头信息 */
+        $this->response->setContentType();
+
+        echo json_encode($message);
+
+        /** 终止后续输出 */
+        exit;
     }
 
 }
