@@ -8,5 +8,5 @@ typecho kindeditor plugin
 
 ## TODO
 
-* 文件浏览
-* 工具栏模式选择
+* :strike:`文件浏览` 为系统安全性不再增加文件浏览
+* :strike:`工具栏模式选择`
