@@ -82,12 +82,77 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
         );
         $editorPasteType = new Typecho_Widget_Helper_Form_Element_Radio('editorPasteType', $editorPasteTypeOptions, '2', _t('粘贴类型'));
 
+        $editorToolsOptions = array(
+            'source' => 'HTML代码',
+            'preview' => '预览',
+            'undo' => '后退',
+            'redo' => '前进',
+            'cut' => '剪切',
+            'copy' => ' 复制',
+            'paste' => '粘贴',
+            'plainpaste' => '粘贴为无格式文本',
+            'wordpaste' => '从Word粘贴',
+            'selectall' => '全选',
+            'justifyleft' => '左对齐',
+            'justifycenter' => '居中',
+            'justifyright' => '右对齐',
+            'justifyfull' => '两端对齐',
+            'insertorderedlist' => '编号',
+            'insertunorderedlist' => '项目符号',
+            'indent' => '增加缩进',
+            'outdent' => '减少缩进',
+            'subscript' => '下标',
+            'superscript' => '上标',
+            'formatblock' => '段落',
+            'fontname' => '字体',
+            'fontsize' => '文字大小',
+            'forecolor' => '文字颜色',
+            'hilitecolor' => '文字背景',
+            'bold' => '粗体',
+            'italic' => '斜体',
+            'underline' => '下划线',
+            'strikethrough' => '删除线',
+            'removeformat' => '删除格式',
+            'image' => '图片',
+            'flash' => 'Flash',
+            'media' => '视音频',
+            'table' => '表格',
+            'hr' => '插入横线',
+            'emoticons' => '插入表情',
+            'link' => '超级链接',
+            'unlink' => '取消超级链接',
+            'fullscreen' => '全屏显示',
+            'about' => '关于',
+            'print' => '打印',
+            'code' => '插入程序代码',
+            'map' => 'Google地图',
+            'baidumap' => '百度地图',
+            'lineheight' => '行距',
+            'clearhtml' => '清理HTML代码',
+            'pagebreak' => ' 插入分页符',
+            'quickformat' => '一键排版',
+            'insertfile' => '插入文件',
+            'template' => '插入模板',
+            'anchor' => '插入锚点',
+            '|' => '分隔',
+            '/' => '换行'
+        );
+        $editorToolsDescription = _t('仅在默认风格有效！');
+
+        $editorTools = new Typecho_Widget_Helper_Form_Element_Checkbox('editorTools', $editorToolsOptions, array('fontname', 'fontsize', '|',
+            'forecolor', 'hilitecolor', 'bold', 'italic', 'underline', 'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright',
+            'insertorderedlist', 'insertunorderedlist', '|', 'emoticons', 'image', 'link'), _t('工具栏'), $editorToolsDescription);
+
+
         $form->addInput($editorTheme);
         $form->addInput($editorLang);
         $form->addInput($editorUploadFlag);
         $form->addItem($line);
         $form->addInput($editorNewlineTag);
         $form->addInput($editorPasteType);
+        $form->addItem($line);
+        $form->addInput($editorTools);
+        $form->addItem($line);
     }
 
     /**
@@ -136,6 +201,16 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
             $editorPasteType = 2;
         }
 
+        if ($editorTheme == 'simple') {
+            $items = array('fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline', 'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist', 'insertunorderedlist', '|', 'emoticons', 'image', 'link');
+        } else if ($editorTheme == 'qq') {
+            $items = array('bold', 'italic', 'underline', 'fontname', 'fontsize', 'forecolor', 'hilitecolor', 'plug-align', 'plug-order', 'plug-indent', 'link');
+        } else {
+            $items = $config->editorTools;
+        }
+        $items = json_encode($items);
+
+
         echo <<<EOF
 <link rel="stylesheet" href="{$editor_default_css_url}" />
 <link rel="stylesheet" href="{$editor_css_url}" />
@@ -159,14 +234,7 @@ KindEditor.ready(function(K) {
         	pasteType : {$editorPasteType},
         	pagebreakHtml:'<!--more-->',
         	afterBlur : function() {keditor.sync();},
-			items : ['source', '|', 'preview', 'template', 'cut', 'copy', 'paste',
-        'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
-        'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
-        'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'code', 'fullscreen', '/',
-        'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
-        'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image',
-        'media', 'insertfile', 'table', 'hr',
-        'anchor', 'link', 'unlink', '|', 'undo', 'redo','|','pagebreak']
+			items :{$items}
         });
 
         //插入编辑器
