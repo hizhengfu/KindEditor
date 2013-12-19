@@ -153,6 +153,11 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
         $form->addItem($line);
         $form->addInput($editorTools);
         $form->addItem($line);
+        echo <<<EOF
+        <style>
+            #typecho-option-item-editorTools-5 span{width:24%;display:inline-block;margin-right:0;}
+        </style>
+EOF;
     }
 
     /**

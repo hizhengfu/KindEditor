@@ -186,7 +186,7 @@ class KindEditor_Upload extends Widget_Upload
     }
 
     /**
-     * 执行升级程序
+     * 执行上传
      *
      * @access public
      * @return void
