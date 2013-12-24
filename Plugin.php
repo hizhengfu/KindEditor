@@ -61,12 +61,6 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
         );
         $editorLang = new Typecho_Widget_Helper_Form_Element_Select('editorLang', $editorLangOptions, 'zh_CN', '语言');
 
-
-        $editorUploadFlagOptions = array('1' => '开启', '0' => '关闭');
-        $editorUploadFlagDescription = _t('附件指图片、文件、视频、Flash文件等。上传文件类型与系统一致。');
-        $editorUploadFlag = new Typecho_Widget_Helper_Form_Element_Radio('editorUploadFlag', $editorUploadFlagOptions, '1', _t('附件上传'), $editorUploadFlagDescription);
-
-
         $line = new Typecho_Widget_Helper_Layout('hr');
 
         $editorNewlineTagOptions = array(
@@ -146,13 +140,17 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
 
         $form->addInput($editorTheme);
         $form->addInput($editorLang);
-        $form->addInput($editorUploadFlag);
         $form->addItem($line);
         $form->addInput($editorNewlineTag);
         $form->addInput($editorPasteType);
         $form->addItem($line);
         $form->addInput($editorTools);
         $form->addItem($line);
+        echo <<<EOF
+        <style>
+            #typecho-option-item-editorTools-4 span{width:24%;display:inline-block;margin-right:0;}
+        </style>
+EOF;
     }
 
     /**
@@ -189,10 +187,7 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
         $kindeditor_js_url = Typecho_Common::url("$pluginName/editor/kindeditor-min.js", $options->pluginUrl);
         $lang_js_url = Typecho_Common::url("$pluginName/editor/lang/$editorLang.js", $options->pluginUrl);
 
-
-        $editorUploadFlag = $config->editorUploadFlag ? 'true' : 'false';
         $editorUploadJson = Typecho_Common::url('action/plugins-kind-upload', Typecho_Widget::widget('Widget_Options')->index);
-
         $editorUploadJson .= isset($post->cid) ? "?cid={$post->cid}" : '';
 
         $editorNewlineTag = $config->editorNewlineTag;
@@ -225,9 +220,9 @@ KindEditor.ready(function(K) {
         	width : '100%',
         	height : '{$options->editorSize}px',
         	langType : '{$editorLang}',
-        	allowImageUpload : {$editorUploadFlag},
-        	allowFlashUpload : {$editorUploadFlag},
-        	allowMediaUpload : {$editorUploadFlag},
+        	allowImageUpload : true,
+        	allowFlashUpload : true,
+        	allowMediaUpload : true,
         	allowFileManager : false,
         	uploadJson : '{$editorUploadJson}',
         	newlineTag : '{$editorNewlineTag}',
