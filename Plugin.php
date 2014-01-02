@@ -78,14 +78,20 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
 
         $editorToolsOptions = array(
             'source' => 'HTML代码',
-            'preview' => '预览',
+            '|' => '分隔',
             'undo' => '后退',
             'redo' => '前进',
+            '|1' => '分隔',
+            'preview' => '预览',
+            'wordpaste' => '从Word粘贴',
+            'print' => '打印',
+            'template' => '插入模板',
+            'code' => '插入程序代码',
             'cut' => '剪切',
             'copy' => ' 复制',
             'paste' => '粘贴',
             'plainpaste' => '粘贴为无格式文本',
-            'wordpaste' => '从Word粘贴',
+            '|2' => '分隔',
             'selectall' => '全选',
             'justifyleft' => '左对齐',
             'justifycenter' => '居中',
@@ -97,16 +103,20 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
             'outdent' => '减少缩进',
             'subscript' => '下标',
             'superscript' => '上标',
+            'removeformat' => '删除格式',
+            'quickformat' => '一键排版',
+            '|3' => '分隔',
             'formatblock' => '段落',
             'fontname' => '字体',
             'fontsize' => '文字大小',
+            '|3' => '分隔',
             'forecolor' => '文字颜色',
             'hilitecolor' => '文字背景',
             'bold' => '粗体',
             'italic' => '斜体',
             'underline' => '下划线',
             'strikethrough' => '删除线',
-            'removeformat' => '删除格式',
+            '|5' => '分隔',
             'image' => '图片',
             'flash' => 'Flash',
             'media' => '视音频',
@@ -116,20 +126,15 @@ class KindEditor_Plugin implements Typecho_Plugin_Interface
             'link' => '超级链接',
             'unlink' => '取消超级链接',
             'fullscreen' => '全屏显示',
-            'about' => '关于',
-            'print' => '打印',
-            'code' => '插入程序代码',
             'map' => 'Google地图',
             'baidumap' => '百度地图',
             'lineheight' => '行距',
             'clearhtml' => '清理HTML代码',
             'pagebreak' => ' 插入分页符',
-            'quickformat' => '一键排版',
-            'insertfile' => '插入文件',
-            'template' => '插入模板',
             'anchor' => '插入锚点',
-            '|' => '分隔',
-            '/' => '换行'
+            'insertfile' => '插入文件',
+            '|6' => '分隔',
+            'about' => '关于'
         );
         $editorToolsDescription = _t('仅在默认风格有效！');
 
@@ -202,6 +207,11 @@ EOF;
             $items = array('bold', 'italic', 'underline', 'fontname', 'fontsize', 'forecolor', 'hilitecolor', 'plug-align', 'plug-order', 'plug-indent', 'link');
         } else {
             $items = $config->editorTools;
+            foreach ($items as $k=>$v) {
+                if (strpos($v, '|') === 0) {
+                    $items[$k]='|';
+                }
+            }
         }
         $items = json_encode($items);
 
